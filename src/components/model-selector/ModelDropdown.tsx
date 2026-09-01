@@ -25,7 +25,7 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
   };
 
   return (
-    <div className="absolute bottom-full start-0 mb-2 w-64 max-h-[60vh] overflow-y-auto bg-background border border-mid-gray/20 rounded-lg shadow-lg py-2 z-50">
+    <div className="absolute bottom-full start-0 mb-2 w-64 max-h-[60vh] overflow-y-auto bg-surface border border-mid-gray/20 rounded-lg shadow-lg p-1 z-50">
       {downloadedModels.length > 0 ? (
         <div>
           {downloadedModels.map((model) => (
@@ -40,7 +40,7 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
               }}
               tabIndex={0}
               role="button"
-              className={`w-full px-3 py-2 text-start hover:bg-mid-gray/10 transition-colors cursor-pointer focus:outline-none ${
+              className={`w-full px-3 py-2 rounded-md text-start hover:bg-logo-primary/8 transition-colors cursor-pointer focus:outline-none ${
                 currentModelId === model.id
                   ? "bg-logo-primary/10 text-logo-primary"
                   : ""
@@ -48,20 +48,20 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-text/80">
+                  <div className="text-sm text-text">
                     {getTranslatedModelName(model, t)}
                     {model.is_custom && (
-                      <span className="ms-1.5 text-[10px] font-medium text-text/40 uppercase">
+                      <span className="ms-1.5 text-[10px] font-semibold text-mid-gray uppercase tracking-wide">
                         {t("modelSelector.custom")}
                       </span>
                     )}
                     {model.supports_streaming && (
-                      <span className="ms-1.5 text-[10px] font-medium text-logo-primary/70 uppercase">
+                      <span className="ms-1.5 text-[10px] font-semibold text-logo-primary uppercase tracking-wide">
                         {t("modelSelector.streaming")}
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-text/40 italic pe-4">
+                  <div className="text-xs text-mid-gray/80 pe-4">
                     {getTranslatedModelDescription(model, t)}
                   </div>
                 </div>
@@ -75,7 +75,7 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
           ))}
         </div>
       ) : (
-        <div className="px-3 py-2 text-sm text-text/60">
+        <div className="px-3 py-2 text-sm text-mid-gray">
           {t("modelSelector.noModelsAvailable")}
         </div>
       )}
