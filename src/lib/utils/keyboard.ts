@@ -216,3 +216,47 @@ export const normalizeKey = (key: string): string => {
   }
   return key;
 };
+
+const COMPACT_SYMBOLS: Record<string, string> = {
+  cmd: "⌘",
+  command: "⌘",
+  meta: "⌘",
+  super: "⌘",
+  win: "⊞",
+  ctrl: "⌃",
+  control: "⌃",
+  alt: "⌥",
+  option: "⌥",
+  shift: "⇧",
+  fn: "fn",
+  space: "Space",
+  enter: "↵",
+  return: "↵",
+  tab: "⇥",
+  escape: "Esc",
+  esc: "Esc",
+  backspace: "⌫",
+  delete: "⌦",
+};
+
+/**
+ * Compact, glyph-first rendering of a shortcut for tight surfaces such as the
+ * floating overlay pill. `formatKeyCombination` stays the long, spelled-out
+ * form used by the settings screens.
+ */
+export const formatShortcutCompact = (combination: string): string => {
+  if (!combination) return "";
+  return combination
+    .split("+")
+    .map((part) => {
+      const key = part
+        .trim()
+        .toLowerCase()
+        .replace(/_(left|right)$/, "");
+      if (COMPACT_SYMBOLS[key]) return COMPACT_SYMBOLS[key];
+      if (/^f\d{1,2}$/.test(key)) return key.toUpperCase();
+      if (key.length === 1) return key.toUpperCase();
+      return key.charAt(0).toUpperCase() + key.slice(1);
+    })
+    .join("");
+};
