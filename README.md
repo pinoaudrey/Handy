@@ -1,10 +1,10 @@
-# Handy
+# CarePilot Dictate
 
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/WVBeWsNXK4)
 
-**A free, open source, and extensible speech-to-text application that works completely offline.**
+**Local speech-to-text for clinicians, free for CarePilot users.**
 
-Handy is a cross-platform desktop application that provides simple, privacy-focused speech transcription. Press a shortcut, speak, and have your words appear in any text field. This happens on your own computer without sending any information to the cloud.
+CarePilot Dictate is a desktop application that turns speech into text in any focused field. Press a shortcut, speak, and the words appear where the cursor is, in the EHR, in a chart note, or in any other application. Transcription runs on the Whisper models on your own device, so the audio never goes to the cloud. CarePilot Dictate is free for CarePilot users.
 
 ## Why Handy?
 
@@ -535,3 +535,7 @@ Handy is open-source software, but the Handy name, logo, icon, and brand assets 
 - **Silero** for great lightweight VAD
 - **Tauri** team for the excellent Rust-based app framework
 - **Community contributors** helping make Handy better
+
+## Notice
+
+CarePilot Dictate is based on [Handy](https://github.com/cjpais/Handy) by CJ Pais, which is licensed under the MIT License.
