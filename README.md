@@ -535,3 +535,7 @@ Handy is open-source software, but the Handy name, logo, icon, and brand assets 
 - **Silero** for great lightweight VAD
 - **Tauri** team for the excellent Rust-based app framework
 - **Community contributors** helping make Handy better
+
+## Notice
+
+CarePilot Dictate is based on [Handy](https://github.com/cjpais/Handy) by CJ Pais, which is licensed under the MIT License.
