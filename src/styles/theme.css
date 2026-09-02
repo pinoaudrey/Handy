@@ -1,58 +1,102 @@
 /* CarePilot Dictate colors */
 
+@font-face {
+  font-family: "OpenSans";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/OpenSans-VariableFont_wdth,wght.ttf")
+    format("truetype-variations");
+}
+
+@font-face {
+  font-family: "OpenSans";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf")
+    format("truetype-variations");
+}
+
 :root {
   /* Palette source of truth. Each themed color is defined once as a
      light/dark pair; the active tokens below and the `data-theme` overrides
-     in App.css reference these, so a hex value lives in exactly one place. */
-  --light-color-text: #0f0f0f;
-  --light-color-background: #fbfbfb;
+     reference these, so a hex value lives in exactly one place.
+     Values come from the CarePilot brand ramps: primary (blue), neutral. */
+
+  /* Text */
+  --light-color-text: #2b2829;
+  --dark-color-text: #f2f5f7;
+
+  /* Page canvas — the calm ground the cards sit on */
+  --light-color-background: #f2f5f7;
+  --dark-color-background: #16191d;
+
+  /* Card / raised surface — sits above the canvas */
+  --light-color-surface: #ffffff;
+  --dark-color-surface: #22272c;
+
+  /* Brand blue. Also the logo fill. */
   --light-color-logo-primary: #3576e7;
   --light-color-logo-stroke: #0f59cd;
-
-  --dark-color-text: #fbfbfb;
-  --dark-color-background: #2c2b29;
   --dark-color-logo-primary: #74a1f0;
   --dark-color-logo-stroke: #a4c3f7;
 
-  /* Semantic status colors. First used by SecureInputWarning; intended to
-     replace the ad-hoc yellow-500/red-500 usages (e.g. ui/Alert.tsx) over
-     time so status styling is themeable from one place. */
-  --light-color-warning: #d97706;
-  --light-color-error: #dc2626;
-  --dark-color-warning: #fbbf24;
-  --dark-color-error: #f87171;
+  /* Accent used for filled controls (primary button, toggle, slider).
+     Was the stock pink #da5893; it is now CarePilot blue. */
+  --light-color-background-ui: #3576e7;
+  --dark-color-background-ui: #4b85ea;
+
+  /* Neutral. Consumed almost everywhere through opacity utilities
+     (mid-gray/10 fills, /20 borders and dividers, /80 field borders),
+     so this one token sets the tone of every surface edge in the app. */
+  --light-color-mid-gray: #64707d;
+  --dark-color-mid-gray: #a4adb6;
+
+  /* Semantic status colors, from the CarePilot ramps. */
+  --light-color-warning: #e39500;
+  --light-color-error: #d8070b;
+  --light-color-success: #4da91b;
+  --dark-color-warning: #ffba38;
+  --dark-color-error: #f76d6d;
+  --dark-color-success: #87de58;
 
   /* Tokens that do not change between light and dark */
-  --color-background-ui: #da5893;
-  --color-text-stroke: #f6f6f6;
-  --color-mid-gray: #808080;
+  --color-text-stroke: #ffffff;
 
   /* Active palette — defaults to light, follows the OS via the media query
      below, or is forced by `data-theme` (see the overrides below). */
   --color-text: var(--light-color-text);
   --color-background: var(--light-color-background);
+  --color-surface: var(--light-color-surface);
   --color-logo-primary: var(--light-color-logo-primary);
   --color-logo-stroke: var(--light-color-logo-stroke);
+  --color-background-ui: var(--light-color-background-ui);
+  --color-mid-gray: var(--light-color-mid-gray);
   --color-warning: var(--light-color-warning);
   --color-error: var(--light-color-error);
+  --color-success: var(--light-color-success);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-text: var(--dark-color-text);
     --color-background: var(--dark-color-background);
+    --color-surface: var(--dark-color-surface);
     --color-logo-primary: var(--dark-color-logo-primary);
     --color-logo-stroke: var(--dark-color-logo-stroke);
+    --color-background-ui: var(--dark-color-background-ui);
+    --color-mid-gray: var(--dark-color-mid-gray);
     --color-warning: var(--dark-color-warning);
     --color-error: var(--dark-color-error);
+    --color-success: var(--dark-color-success);
   }
 }
 
 /*
  * Explicit theme override, driven by the `theme` setting via
  * `document.documentElement.dataset.theme`. When set, the higher-specificity
- * attribute selectors win over the `prefers-color-scheme` media query above,
- * so a user can keep Handy light or dark regardless of the OS setting.
+ * attribute selectors win over the `prefers-color-scheme` media query above.
  * `system` (or no attribute) leaves the OS in charge.
  *
  * Lives here (not in App.css) so every window that imports the shared palette —
@@ -61,17 +105,25 @@
 :root[data-theme="light"] {
   --color-text: var(--light-color-text);
   --color-background: var(--light-color-background);
+  --color-surface: var(--light-color-surface);
   --color-logo-primary: var(--light-color-logo-primary);
   --color-logo-stroke: var(--light-color-logo-stroke);
+  --color-background-ui: var(--light-color-background-ui);
+  --color-mid-gray: var(--light-color-mid-gray);
   --color-warning: var(--light-color-warning);
   --color-error: var(--light-color-error);
+  --color-success: var(--light-color-success);
 }
 
 :root[data-theme="dark"] {
   --color-text: var(--dark-color-text);
   --color-background: var(--dark-color-background);
+  --color-surface: var(--dark-color-surface);
   --color-logo-primary: var(--dark-color-logo-primary);
   --color-logo-stroke: var(--dark-color-logo-stroke);
+  --color-background-ui: var(--dark-color-background-ui);
+  --color-mid-gray: var(--dark-color-mid-gray);
   --color-warning: var(--dark-color-warning);
   --color-error: var(--dark-color-error);
+  --color-success: var(--dark-color-success);
 }
