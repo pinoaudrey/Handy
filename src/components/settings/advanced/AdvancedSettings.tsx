@@ -23,6 +23,7 @@ import { AccelerationSelector } from "../AccelerationSelector";
 import { LazyStreamClose } from "../LazyStreamClose";
 import { FillerWordRemoval } from "../FillerWordRemoval";
 import { VadBackendSelector } from "../VadBackendSelector";
+import { SettingsPageHeader } from "../../ui/SettingsPageHeader";
 
 export const AdvancedSettings: React.FC = () => {
   const { t } = useTranslation();
@@ -30,14 +31,21 @@ export const AdvancedSettings: React.FC = () => {
   const experimentalEnabled = getSetting("experimental_enabled") || false;
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
+    <div className="settings-page max-w-3xl w-full mx-auto">
+      <SettingsPageHeader
+        title={t("settings.advanced.title")}
+        subtitle={t("settings.advanced.description")}
+      />
       <SettingsGroup title={t("settings.advanced.groups.app")}>
         <StartHidden descriptionMode="tooltip" grouped={true} />
         <AutostartToggle descriptionMode="tooltip" grouped={true} />
         <ShowTrayIcon descriptionMode="tooltip" grouped={true} />
-        <ShowOverlay descriptionMode="tooltip" grouped={true} />
         <ModelUnloadTimeoutSetting descriptionMode="tooltip" grouped={true} />
         <ExperimentalToggle descriptionMode="tooltip" grouped={true} />
+      </SettingsGroup>
+
+      <SettingsGroup title={t("settings.advanced.overlay.groupTitle")}>
+        <ShowOverlay descriptionMode="tooltip" grouped={true} />
       </SettingsGroup>
 
       <SettingsGroup title={t("settings.advanced.groups.output")}>

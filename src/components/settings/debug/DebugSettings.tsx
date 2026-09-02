@@ -14,12 +14,17 @@ import { ClamshellMicrophoneSelector } from "../ClamshellMicrophoneSelector";
 import { UpdateChecksToggle } from "../UpdateChecksToggle";
 import { WhatsNewPreview } from "./WhatsNewPreview";
 import { KeyboardDiagnostic } from "./KeyboardDiagnostic";
+import { SettingsPageHeader } from "../../ui/SettingsPageHeader";
 
 export const DebugSettings: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
+    <div className="settings-page max-w-3xl w-full mx-auto">
+      <SettingsPageHeader
+        title={t("settings.debug.title")}
+        subtitle={t("settings.debug.description")}
+      />
       <SettingsGroup title={t("settings.debug.title")}>
         <LogLevelSelector grouped={true} />
         <WhatsNewPreview descriptionMode="tooltip" grouped={true} />

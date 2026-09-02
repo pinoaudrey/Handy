@@ -71,7 +71,7 @@ export const KeyboardDiagnostic: React.FC = () => {
   };
 
   return (
-    <div className="p-4 space-y-2">
+    <div className="settings-row flex-col items-stretch">
       <div className="flex justify-between items-center gap-2">
         <div>
           <p className="text-sm font-medium">

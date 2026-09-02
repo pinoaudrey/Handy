@@ -21,6 +21,7 @@ import { ModelSelect } from "../PostProcessingSettingsApi/ModelSelect";
 import { usePostProcessProviderState } from "../PostProcessingSettingsApi/usePostProcessProviderState";
 import { ShortcutInput } from "../ShortcutInput";
 import { useSettings } from "../../../hooks/useSettings";
+import { SettingsPageHeader } from "../../ui/SettingsPageHeader";
 
 const PostProcessingSettingsApiComponent: React.FC = () => {
   const { t } = useTranslation();
@@ -428,7 +429,11 @@ export const PostProcessingSettings: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
+    <div className="settings-page max-w-3xl w-full mx-auto">
+      <SettingsPageHeader
+        title={t("sidebar.postProcessing")}
+        subtitle={t("settings.postProcessing.description")}
+      />
       <SettingsGroup title={t("settings.postProcessing.hotkey.title")}>
         <ShortcutInput
           shortcutId="transcribe_with_post_process"

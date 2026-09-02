@@ -12,19 +12,63 @@ import { useSettings } from "../../../hooks/useSettings";
 import { VolumeSlider } from "../VolumeSlider";
 import { MuteWhileRecording } from "../MuteWhileRecording";
 import { ModelSettingsCard } from "./ModelSettingsCard";
+import { SettingsPageHeader } from "../../ui/SettingsPageHeader";
+import { Layers3 } from "lucide-react";
+import type { ModelInfo } from "@/bindings";
+import { useModelStore } from "@/stores/modelStore";
 
-export const GeneralSettings: React.FC = () => {
+interface GeneralSettingsProps {
+  onNavigateModels?: () => void;
+}
+
+export const GeneralSettings: React.FC<GeneralSettingsProps> = ({
+  onNavigateModels = () => {},
+}) => {
   const { t } = useTranslation();
   const { audioFeedbackEnabled } = useSettings();
+  const { currentModel, models } = useModelStore();
+  const activeModel = models.find(
+    (model: ModelInfo) => model.id === currentModel,
+  );
   const isLinux = type() === "linux";
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
-      <SettingsGroup title={t("settings.general.title")}>
+    <div className="settings-page max-w-3xl w-full mx-auto">
+      <SettingsPageHeader
+        title={t("settings.general.title")}
+        subtitle={t("settings.general.description")}
+      />
+      <SettingsGroup title={t("settings.general.shortcut.title")}>
         <ShortcutInput shortcutId="transcribe" grouped={true} />
         <ShortcutActivationSetting descriptionMode="tooltip" grouped={true} />
         {/* Cancel shortcut remains hidden on Linux because of dynamic shortcut instability. */}
         {!isLinux && <ShortcutInput shortcutId="cancel" grouped={true} />}
       </SettingsGroup>
+      {activeModel && (
+        <SettingsGroup title={t("settings.general.model.title")}>
+          <div className="settings-row model-summary-row">
+            <span className="model-icon-tile" aria-hidden="true">
+              <Layers3 />
+            </span>
+            <div className="model-summary-copy">
+              <div className="model-summary-title">
+                <strong>{activeModel.name}</strong>
+                <span className="on-device-badge">
+                  <i />
+                  {t("settings.general.model.badge")}
+                </span>
+              </div>
+              <p>{t("settings.general.model.description")}</p>
+            </div>
+            <button
+              type="button"
+              className="model-change-button"
+              onClick={onNavigateModels}
+            >
+              {t("settings.general.model.change")}
+            </button>
+          </div>
+        </SettingsGroup>
+      )}
       <ModelSettingsCard />
       <SettingsGroup title={t("settings.sound.title")}>
         <MicrophoneSelector descriptionMode="tooltip" grouped={true} />

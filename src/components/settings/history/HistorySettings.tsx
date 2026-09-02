@@ -14,6 +14,7 @@ import { useOsType } from "@/hooks/useOsType";
 import { formatDateTime } from "@/utils/dateFormat";
 import { AudioPlayer, AudioPlayerGroup } from "../../ui/AudioPlayer";
 import { Button } from "../../ui/Button";
+import { SettingsPageHeader } from "../../ui/SettingsPageHeader";
 
 const IconButton: React.FC<{
   onClick: () => void;
@@ -252,7 +253,7 @@ export const HistorySettings: React.FC = () => {
     content = (
       <>
         <AudioPlayerGroup>
-          <div className="divide-y divide-mid-gray/15">
+          <div className="divide-y divide-[#EEF1F4]">
             {entries.map((entry) => (
               <HistoryEntryComponent
                 key={entry.id}
@@ -273,23 +274,20 @@ export const HistorySettings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
-      <div className="space-y-2">
-        <div className="px-1 flex items-center justify-between">
-          <div>
-            <h2 className="text-xs font-semibold text-mid-gray uppercase tracking-wider">
-              {t("settings.history.title")}
-            </h2>
-          </div>
+    <div className="settings-page max-w-3xl w-full mx-auto">
+      <SettingsPageHeader
+        title={t("settings.history.title")}
+        subtitle={t("settings.history.description")}
+        action={
           <OpenRecordingsButton
             onClick={openRecordingsFolder}
             label={t("settings.history.openFolder")}
           />
-        </div>
-        <div className="bg-surface border border-mid-gray/20 rounded-xl shadow-sm overflow-visible">
-          {content}
-        </div>
-      </div>
+        }
+      />
+      <section className="settings-group">
+        <div className="settings-card">{content}</div>
+      </section>
     </div>
   );
 };
@@ -356,7 +354,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   const formattedDate = formatDateTime(String(entry.timestamp), i18n.language);
 
   return (
-    <div className="px-4 py-2 pb-5 flex flex-col gap-3">
+    <div className="px-[18px] py-[14px] flex flex-col gap-3">
       <div className="flex justify-between items-center">
         <p className="text-xs font-semibold text-mid-gray uppercase tracking-wide">
           {formattedDate}

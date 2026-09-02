@@ -10,6 +10,9 @@
     "secureInputWarning": "⚠ Shortcuts blocked by Secure Input"
   },
   "sidebar": {
+    "brand": "CarePilot Dictate",
+    "version": "Version {{version}}",
+    "deviceNote": "Runs on-device · Free for CarePilot users",
     "general": "General",
     "models": "Models",
     "advanced": "Advanced",
@@ -160,6 +163,16 @@
     },
     "general": {
       "title": "General",
+      "description": "Configure shortcuts, your transcription model, and audio devices.",
+      "model": {
+        "title": "Transcription model",
+        "badge": "On-device",
+        "description": "Audio never leaves this Mac. Best accuracy for clinical vocabulary.",
+        "change": "Change"
+      },
+      "floatingBar": {
+        "pillLabel": "Dictate"
+      },
       "shortcut": {
         "title": "CarePilot Dictate Shortcuts",
         "description": "Configure keyboard shortcuts to trigger speech-to-text recording",
@@ -259,6 +272,8 @@
       }
     },
     "advanced": {
+      "title": "Advanced",
+      "description": "Control app behavior, text insertion, and transcription details.",
       "groups": {
         "app": "App",
         "output": "Output",
@@ -300,6 +315,7 @@
         "description": "Display the CarePilot Dictate icon in the system tray."
       },
       "overlay": {
+        "groupTitle": "Floating bar",
         "style": {
           "title": "Overlay",
           "description": "Choose the recording overlay: None hides it, Minimal shows a compact pill, Live shows transcription in real time as you speak (streaming-capable models only — look for the Streaming badge in the model picker). On Linux 'None' is recommended.",
@@ -401,6 +417,7 @@
       }
     },
     "postProcessing": {
+      "description": "Configure optional refinement for completed transcriptions.",
       "hotkey": {
         "title": "Hotkey"
       },
@@ -456,6 +473,7 @@
     },
     "history": {
       "title": "History",
+      "description": "Review, copy, save, or replay your recent transcriptions.",
       "openFolder": "Open Recordings Folder",
       "loading": "Loading history...",
       "empty": "No transcriptions yet. Start recording to build your history!",
@@ -471,6 +489,7 @@
     },
     "debug": {
       "title": "Debug",
+      "description": "Inspect diagnostics and tune development settings.",
       "logDirectory": {
         "title": "Log Directory",
         "description": "Location where log files are stored"
@@ -597,6 +616,7 @@
       }
     },
     "about": {
+      "description": "Manage app preferences and view version information.",
       "title": "About",
       "version": {
         "title": "Version",
@@ -693,6 +713,9 @@
     }
   },
   "overlay": {
+    "dictate": "Dictate",
+    "listening": "Listening…",
+    "inserting": "Inserting…",
     "transcribing": "Transcribing...",
     "processing": "Processing..."
   },
