@@ -689,6 +689,7 @@ pub fn change_overlay_style_setting(app: AppHandle, style: String) -> Result<(),
     // Keep the cached overlay-enabled flag in sync so emit_levels stops (or
     // resumes) emitting on the next audio callback.
     crate::overlay::update_overlay_enabled_cache(parsed != OverlayStyle::None);
+    crate::overlay::set_overlay_visible(&app, parsed != OverlayStyle::None);
 
     // Reposition in case the window needs to re-center for the new style.
     crate::utils::update_overlay_position(&app);

@@ -398,7 +398,7 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
     .transparent(true)
     .focusable(false)
     .focused(false)
-    .visible(false);
+    .visible(true);
 
     if let Some(data_dir) = crate::portable::data_dir() {
         builder = builder.data_directory(data_dir.join("webview"));
@@ -407,6 +407,12 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
     #[allow(unused_variables)]
     match builder.build() {
         Ok(window) => {
+            if let Some((x, y)) =
+                calculate_overlay_position(app_handle, OVERLAY_WIDTH, OVERLAY_HEIGHT)
+            {
+                let _ = window.set_position(tauri::LogicalPosition::new(x, y));
+            }
+
             #[cfg(target_os = "linux")]
             {
                 // Try to initialize GTK layer shell, ignore errors if compositor doesn't support it
@@ -453,9 +459,7 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
             )
             .build()
         {
-            Ok(panel) => {
-                panel.hide();
-            }
+            Ok(_panel) => {}
             Err(e) => {
                 log::error!("Failed to create recording overlay panel: {}", e);
             }
@@ -469,6 +473,9 @@ fn show_overlay_state(app_handle: &AppHandle, state: &str) {
     // so the common overlay-disabled case never pays for a main-thread hop.
     let settings = settings::get_settings(app_handle);
     if settings.overlay_style == OverlayStyle::None {
+        if let Some(w) = app_handle.get_webview_window("recording_overlay") {
+            let _ = w.hide();
+        }
         return;
     }
 
@@ -682,8 +689,21 @@ pub fn hide_recording_overlay(app_handle: &AppHandle) {
                 log::debug!("Skipping stale overlay hide: a newer session is showing the overlay");
                 return;
             }
-            let _ = window_clone.hide();
+            let _ = window_clone.emit("show-overlay", "idle");
         });
+    }
+}
+
+/// Show or hide the persistent overlay window in response to an
+/// `overlay_style` change. Called from the settings path.
+pub fn set_overlay_visible(app: &AppHandle, visible: bool) {
+    if let Some(w) = app.get_webview_window("recording_overlay") {
+        if visible {
+            let _ = w.show();
+            let _ = w.emit("show-overlay", "idle");
+        } else {
+            let _ = w.hide();
+        }
     }
 }
 

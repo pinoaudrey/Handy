@@ -10,9 +10,15 @@ import type {
   StreamWorkKind,
 } from "@/bindings";
 import i18n, { syncLanguageFromSettings } from "@/i18n";
+import { formatShortcutCompact } from "@/lib/utils/keyboard";
 import { getLanguageDirection } from "@/lib/utils/rtl";
 
-type OverlayState = "recording" | "streaming" | "transcribing" | "processing";
+type OverlayState =
+  | "idle"
+  | "recording"
+  | "streaming"
+  | "transcribing"
+  | "processing";
 
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
@@ -22,6 +28,7 @@ const RecordingOverlay: React.FC = () => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [state, setState] = useState<OverlayState>("recording");
+  const [hotkey, setHotkey] = useState<string>("");
   // `Stream::play()` returning does not mean hardware callbacks are flowing.
   // Stay visually in an arming state until the backend processes the first
   // actual microphone sample chunk.
@@ -75,6 +82,9 @@ const RecordingOverlay: React.FC = () => {
             setPosition(
               settings.data.overlay_position === "top" ? "top" : "bottom",
             );
+            const binding =
+              settings.data.bindings?.["transcribe"]?.current_binding;
+            setHotkey(binding ? formatShortcutCompact(binding) : "");
           }
         } catch {
           // Keep the previous/default placement if settings can't be read.
@@ -156,6 +166,36 @@ const RecordingOverlay: React.FC = () => {
     pinnedRef.current = true;
     setOverflowing(false);
   }, [session]);
+
+  if (state === "idle") {
+    return (
+      <div className={`ov-stage ${position}`}>
+        <div className="scard idle">
+          <div className="sbase">
+            <span className="sidle-mic" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+              </svg>
+            </span>
+            {/* eslint-disable-next-line i18next/no-literal-string */}
+            <span className="sidle-label">
+              Dictate
+              {hotkey ? <span className="sidle-key">{hotkey}</span> : null}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isVisible) return null;
 
