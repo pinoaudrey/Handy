@@ -112,16 +112,16 @@ const ModelCard: React.FC<ModelCardProps> = ({
   );
 
   const baseClasses =
-    "flex flex-col rounded-xl px-4 py-3 gap-2 text-left bg-surface transition-all duration-200";
+    "flex flex-col rounded-xl px-[18px] py-[14px] gap-2 text-left bg-surface border border-[#E3E8EC] transition-all duration-200";
 
   const getVariantClasses = () => {
     if (status === "active") {
-      return "border-2 border-logo-primary bg-logo-primary/5 shadow-sm";
+      return "border-logo-primary bg-logo-primary/5";
     }
     if (isFeatured) {
-      return "border-2 border-logo-primary/30";
+      return "border-logo-primary/30";
     }
-    return "border-2 border-mid-gray/20";
+    return "border-[#E3E8EC]";
   };
 
   const getInteractiveClasses = () => {

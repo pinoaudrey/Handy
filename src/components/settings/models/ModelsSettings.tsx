@@ -18,6 +18,7 @@ import {
   supportsLanguageCode,
 } from "@/lib/constants/languages.ts";
 import type { ModelInfo } from "@/bindings";
+import { SettingsPageHeader } from "@/components/ui/SettingsPageHeader";
 
 // check if model supports a language based on its supported_languages list
 const modelSupportsLanguage = (model: ModelInfo, langCode: string): boolean => {
@@ -227,7 +228,11 @@ export const ModelsSettings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-3xl w-full mx-auto">
+      <div className="settings-page max-w-3xl w-full mx-auto">
+        <SettingsPageHeader
+          title={t("settings.models.title")}
+          subtitle={t("settings.models.description")}
+        />
         <div className="flex items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-mid-gray/25 border-t-logo-primary rounded-full animate-spin" />
         </div>
@@ -236,15 +241,11 @@ export const ModelsSettings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-4">
-      <div className="mb-4">
-        <h1 className="text-xl font-semibold text-text mb-1">
-          {t("settings.models.title")}
-        </h1>
-        <p className="text-sm text-mid-gray">
-          {t("settings.models.description")}
-        </p>
-      </div>
+    <div className="settings-page max-w-3xl w-full mx-auto">
+      <SettingsPageHeader
+        title={t("settings.models.title")}
+        subtitle={t("settings.models.description")}
+      />
 
       {/* Search bar — filter the catalog by name or description */}
       <div className="relative">
@@ -258,9 +259,9 @@ export const ModelsSettings: React.FC = () => {
         />
       </div>
 
-      <div className="space-y-6">
+      <div className="settings-model-groups">
         {/* Downloaded Models Section — header always visible so filter stays accessible */}
-        <div className="space-y-3">
+        <section className="settings-group">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold text-mid-gray uppercase tracking-wider">
               {t("settings.models.yourModels")}
@@ -418,11 +419,11 @@ export const ModelsSettings: React.FC = () => {
               showRecommended={false}
             />
           ))}
-        </div>
+        </section>
 
         {/* Available Models Section */}
         {availableModels.length > 0 && (
-          <div className="space-y-3">
+          <section className="settings-group">
             <h2 className="text-xs font-semibold text-mid-gray uppercase tracking-wider">
               {t("settings.models.availableModels")}
             </h2>
@@ -440,7 +441,7 @@ export const ModelsSettings: React.FC = () => {
                 showRecommended={true}
               />
             ))}
-          </div>
+          </section>
         )}
         {filteredModels.length === 0 && (
           <div className="text-center py-8 text-mid-gray">

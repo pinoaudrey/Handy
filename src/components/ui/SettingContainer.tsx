@@ -23,178 +23,94 @@ export const SettingContainer: React.FC<SettingContainerProps> = ({
   tooltipPosition = "top",
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
+  const tooltipTargetRef = useRef<HTMLDivElement>(null);
 
-  // Handle click outside to close tooltip
   useEffect(() => {
+    if (!showTooltip) return;
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        tooltipRef.current &&
-        !tooltipRef.current.contains(event.target as Node)
-      ) {
+      if (!tooltipTargetRef.current?.contains(event.target as Node)) {
         setShowTooltip(false);
       }
     };
 
-    if (showTooltip) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showTooltip]);
 
-  const toggleTooltip = () => {
-    setShowTooltip(!showTooltip);
-  };
+  const rowClasses = grouped
+    ? "settings-row"
+    : "settings-row rounded-xl border border-mid-gray/20 bg-surface";
 
-  const containerClasses = grouped
-    ? "px-4 py-3"
-    : "px-4 py-3 rounded-xl border border-mid-gray/20 bg-surface";
+  const descriptionTooltip = (
+    <div
+      ref={tooltipTargetRef}
+      className="setting-description-tooltip"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      <button
+        type="button"
+        className="setting-description-trigger"
+        aria-label={`${title}: ${description}`}
+        aria-expanded={showTooltip}
+        onClick={() => setShowTooltip((visible) => !visible)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") setShowTooltip(false);
+        }}
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </button>
+      {showTooltip && (
+        <Tooltip targetRef={tooltipTargetRef} position={tooltipPosition}>
+          <p className="text-sm text-center leading-relaxed">{description}</p>
+        </Tooltip>
+      )}
+    </div>
+  );
+
+  const heading = (
+    <div className={`setting-title-row ${disabled ? "opacity-50" : ""}`}>
+      <h3>{title}</h3>
+      {descriptionMode === "tooltip" && descriptionTooltip}
+    </div>
+  );
 
   if (layout === "stacked") {
-    if (descriptionMode === "tooltip") {
-      return (
-        <div className={containerClasses}>
-          <div className="flex items-center gap-2 mb-2">
-            <h3
-              className={`text-sm font-semibold ${disabled ? "opacity-50" : ""}`}
-            >
-              {title}
-            </h3>
-            <div
-              ref={tooltipRef}
-              className="relative"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-              onClick={toggleTooltip}
-            >
-              <svg
-                className="w-4 h-4 text-mid-gray/70 cursor-help hover:text-logo-primary transition-colors duration-200 select-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="More information"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleTooltip();
-                  }
-                }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              {showTooltip && (
-                <Tooltip targetRef={tooltipRef} position="top">
-                  <p className="text-sm text-center leading-relaxed">
-                    {description}
-                  </p>
-                </Tooltip>
-              )}
-            </div>
-          </div>
-          <div className="w-full">{children}</div>
-        </div>
-      );
-    }
-
     return (
-      <div className={containerClasses}>
-        <div className="mb-2">
-          <h3
-            className={`text-sm font-semibold ${disabled ? "opacity-50" : ""}`}
-          >
-            {title}
-          </h3>
-          <p
-            className={`text-xs text-mid-gray mt-0.5 ${disabled ? "opacity-50" : ""}`}
-          >
-            {description}
-          </p>
+      <div className={`${rowClasses} flex-col items-stretch`}>
+        <div>
+          {heading}
+          {descriptionMode === "inline" && (
+            <p className={disabled ? "opacity-50" : ""}>{description}</p>
+          )}
         </div>
         <div className="w-full">{children}</div>
       </div>
     );
   }
 
-  // Horizontal layout (default)
-  const horizontalContainerClasses = grouped
-    ? "flex items-center justify-between gap-4 min-h-12 px-4 py-2"
-    : "flex items-center justify-between gap-4 min-h-12 px-4 py-2 rounded-xl border border-mid-gray/20 bg-surface";
-
-  if (descriptionMode === "tooltip") {
-    return (
-      <div className={horizontalContainerClasses}>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3
-              className={`text-sm font-semibold ${disabled ? "opacity-50" : ""}`}
-            >
-              {title}
-            </h3>
-            <div
-              ref={tooltipRef}
-              className="relative"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-              onClick={toggleTooltip}
-            >
-              <svg
-                className="w-4 h-4 text-mid-gray/70 cursor-help hover:text-logo-primary transition-colors duration-200 select-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="More information"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleTooltip();
-                  }
-                }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              {showTooltip && (
-                <Tooltip targetRef={tooltipRef} position={tooltipPosition}>
-                  <p className="text-sm text-center leading-relaxed">
-                    {description}
-                  </p>
-                </Tooltip>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="relative">{children}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className={horizontalContainerClasses}>
+    <div className={rowClasses}>
       <div className="min-w-0 flex-1">
-        <h3 className={`text-sm font-semibold ${disabled ? "opacity-50" : ""}`}>
-          {title}
-        </h3>
-        <p
-          className={`text-xs text-mid-gray mt-0.5 ${disabled ? "opacity-50" : ""}`}
-        >
-          {description}
-        </p>
+        {heading}
+        {descriptionMode === "inline" && (
+          <p className={disabled ? "opacity-50" : ""}>{description}</p>
+        )}
       </div>
-      <div className="relative">{children}</div>
+      <div className="relative shrink-0">{children}</div>
     </div>
   );
 };

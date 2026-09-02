@@ -7,7 +7,6 @@ import type {
   StreamPhase,
   StreamPhaseEvent,
   StreamTextEvent,
-  StreamWorkKind,
 } from "@/bindings";
 import i18n, { syncLanguageFromSettings } from "@/i18n";
 import { formatShortcutCompact } from "@/lib/utils/keyboard";
@@ -20,18 +19,29 @@ type OverlayState =
   | "transcribing"
   | "processing";
 
-// Number of reactive bars in the waveform (the simple, smoothed style shared by
-// every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
 const WAVE_BARS = 9;
+
+const MicrophoneGlyph = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+  </svg>
+);
 
 const RecordingOverlay: React.FC = () => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [state, setState] = useState<OverlayState>("recording");
-  const [hotkey, setHotkey] = useState<string>("");
-  // `Stream::play()` returning does not mean hardware callbacks are flowing.
-  // Stay visually in an arming state until the backend processes the first
-  // actual microphone sample chunk.
+  const [hotkey, setHotkey] = useState("");
   const [captureReady, setCaptureReady] = useState(false);
   const [levels, setLevels] = useState<number[]>(Array(WAVE_BARS).fill(0));
   const [streamText, setStreamText] = useState<StreamTextEvent>({
@@ -39,22 +49,12 @@ const RecordingOverlay: React.FC = () => {
     tentative: "",
   });
   const [phase, setPhase] = useState<StreamPhase>("listening");
-  const [workKind, setWorkKind] = useState<StreamWorkKind>("transcribing");
   const [elapsed, setElapsed] = useState(0);
-  // Bumped on each new streaming session so the Live card remounts fresh (replays
-  // the pop-in, and never animates in from the previous panel's open size).
   const [session, setSession] = useState(0);
-  // Overlay placement (top vs bottom of the screen). The Live panel grows downward
-  // from a top overlay (oldest line under the pill) and upward from a bottom one.
   const [position, setPosition] = useState<"top" | "bottom">("bottom");
-  // True once live text overflows the cap. A top overlay fades its top edge only
-  // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
 
   const smoothedLevelsRef = useRef<number[]>(Array(16).fill(0));
-  // Live-text scroll-back: the text region "sticks" to the newest line while the
-  // user is at the bottom; if they scroll up to read history, auto-follow pauses
-  // until they scroll back down.
   const capRef = useRef<HTMLDivElement>(null);
   const pinnedRef = useRef(true);
   const direction = getLanguageDirection(i18n.language);
@@ -63,9 +63,6 @@ const RecordingOverlay: React.FC = () => {
     const setupEventListeners = async () => {
       const unlistenShow = await listen("show-overlay", async (event) => {
         const overlayState = event.payload as OverlayState;
-        // Reset synchronously before settings I/O. A fast microphone can emit
-        // recording-ready while the awaits below are in flight; resetting after
-        // them would overwrite that event and leave the overlay stuck arming.
         if (overlayState === "recording" || overlayState === "streaming") {
           setCaptureReady(false);
           smoothedLevelsRef.current = Array(16).fill(0);
@@ -74,8 +71,6 @@ const RecordingOverlay: React.FC = () => {
         }
 
         await syncLanguageFromSettings();
-        // The Live panel flows downward from a top overlay and upward from a
-        // bottom one; read the placement so the layout can flip to match.
         try {
           const settings = await commands.getAppSettings();
           if (settings.status === "ok") {
@@ -87,14 +82,14 @@ const RecordingOverlay: React.FC = () => {
             setHotkey(binding ? formatShortcutCompact(binding) : "");
           }
         } catch {
-          // Keep the previous/default placement if settings can't be read.
+          // Keep the prior placement and shortcut if settings are unavailable.
         }
+
         setState(overlayState);
         if (overlayState === "streaming") {
           setPhase("listening");
-          setWorkKind("transcribing");
           setElapsed(0);
-          setSession((s) => s + 1); // remount the card fresh for this session
+          setSession((current) => current + 1);
         }
         setIsVisible(true);
       });
@@ -110,12 +105,9 @@ const RecordingOverlay: React.FC = () => {
       });
 
       const unlistenLevel = await listen<number[]>("mic-level", (event) => {
-        const newLevels = event.payload as number[];
-        // Exponential smoothing across the 16 buckets, then take the first N
-        // bars for the shared waveform.
-        const smoothed = smoothedLevelsRef.current.map((prev, i) => {
-          const target = newLevels[i] || 0;
-          return prev * 0.7 + target * 0.3;
+        const smoothed = smoothedLevelsRef.current.map((previous, index) => {
+          const target = event.payload[index] || 0;
+          return previous * 0.7 + target * 0.3;
         });
         smoothedLevelsRef.current = smoothed;
         setLevels(smoothed.slice(0, WAVE_BARS));
@@ -128,7 +120,6 @@ const RecordingOverlay: React.FC = () => {
       const unlistenPhase = await events.streamPhaseEvent.listen((event) => {
         const payload: StreamPhaseEvent = event.payload;
         setPhase(payload.phase);
-        if (payload.kind) setWorkKind(payload.kind);
       });
 
       return () => {
@@ -141,92 +132,63 @@ const RecordingOverlay: React.FC = () => {
       };
     };
 
-    setupEventListeners();
+    const cleanup = setupEventListeners();
+    return () => {
+      cleanup.then((unlisten) => unlisten());
+    };
   }, []);
 
-  // Elapsed capture timer starts only once microphone samples are flowing.
   useEffect(() => {
     if (state !== "streaming" || !isVisible || !captureReady) return;
-    const id = setInterval(() => setElapsed((e) => e + 1), 1000);
-    return () => clearInterval(id);
+
+    const interval = setInterval(
+      () => setElapsed((current) => current + 1),
+      1000,
+    );
+    return () => clearInterval(interval);
   }, [state, isVisible, captureReady]);
 
-  // Stick to the bottom as text streams in — but only while pinned, so a user who
-  // has scrolled up to read history isn't yanked back down by the next chunk.
   useLayoutEffect(() => {
-    const el = capRef.current;
-    if (!el) return;
-    // Fade the top edge only once text actually overflows the cap.
-    setOverflowing(el.scrollHeight > el.clientHeight + 1);
-    if (pinnedRef.current) el.scrollTop = el.scrollHeight;
+    const element = capRef.current;
+    if (!element) return;
+
+    setOverflowing(element.scrollHeight > element.clientHeight + 1);
+    if (pinnedRef.current) element.scrollTop = element.scrollHeight;
   }, [streamText]);
 
-  // Each fresh streaming session starts pinned to the bottom, fade cleared.
   useEffect(() => {
     pinnedRef.current = true;
     setOverflowing(false);
   }, [session]);
 
-  if (state === "idle") {
-    return (
-      <div className={`ov-stage ${position}`}>
-        <div className="scard idle">
-          <div className="sbase">
-            <span className="sidle-mic" aria-hidden="true">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                <line x1="12" y1="19" x2="12" y2="23" />
-              </svg>
-            </span>
-            {/* eslint-disable-next-line i18next/no-literal-string */}
-            <span className="sidle-label">
-              Dictate
-              {hotkey ? <span className="sidle-key">{hotkey}</span> : null}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isVisible) return null;
-
-  // Re-pin when the user is within ~a line of the bottom; unpin otherwise.
   const handleStreamScroll = () => {
-    const el = capRef.current;
-    if (!el) return;
-    pinnedRef.current = el.scrollHeight - el.scrollTop - el.clientHeight <= 16;
+    const element = capRef.current;
+    if (!element) return;
+    pinnedRef.current =
+      element.scrollHeight - element.scrollTop - element.clientHeight <= 16;
   };
 
-  const fmtTime = (s: number) =>
-    `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-
-  // ---- Shared building blocks (one visual language for every overlay form) ----
   const waveform = (
-    <div className={`swave ${captureReady ? "ready" : "arming"}`}>
-      {levels.map((v, i) => (
-        <i
-          key={i}
-          style={{
-            height: `${Math.max(3, Math.min(18, 3 + Math.pow(v, 0.7) * 15))}px`,
-          }}
-        />
-      ))}
+    <div
+      className={`overlay-waveform ${captureReady ? "ready" : "arming"}`}
+      aria-hidden="true"
+    >
+      {levels.map((level, index) => {
+        const height = Math.max(3, Math.min(18, 3 + Math.pow(level, 0.7) * 15));
+        const backgroundColor =
+          height >= 11 ? "#FFFFFF" : index % 2 ? "#9CC0F7" : "#CFE0FB";
+        return (
+          <i key={index} style={{ height: `${height}px`, backgroundColor }} />
+        );
+      })}
     </div>
   );
 
-  const cancelBtn = (
+  const cancelButton = (
     <button
-      className="sx"
-      aria-label="cancel"
+      type="button"
+      className="overlay-cancel"
+      aria-label={t("common.cancel")}
       onClick={() => commands.cancelOperation()}
     >
       <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -240,103 +202,89 @@ const RecordingOverlay: React.FC = () => {
     </button>
   );
 
-  // dot (left) | waveform (center) | timer + cancel (right) — same structure for
-  // pill & panel, so the Live morph is a pure width change.
-  const listeningRow = (showTimer: boolean, showCancel: boolean) => (
-    <div className="sbase">
-      <div className="sbase-l">
-        <span className={`sdot ${captureReady ? "ready" : "arming"}`} />
-      </div>
+  const formatElapsed = (seconds: number) =>
+    `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+
+  const renderListeningRow = (showTimer = false) => (
+    <div className="overlay-control-row listening">
+      <span className="overlay-leading">
+        <MicrophoneGlyph />
+      </span>
       {waveform}
-      <div className="sbase-r">
-        {showTimer && <span className="stimer">{fmtTime(elapsed)}</span>}
-        {showCancel && cancelBtn}
-      </div>
+      <strong>{t("overlay.listening")}</strong>
+      {showTimer && (
+        <span className="overlay-timer">{formatElapsed(elapsed)}</span>
+      )}
+      {cancelButton}
     </div>
   );
 
-  // spinner (left) | label (center) | cancel (right) — same 3-zone grid as the
-  // listening row, so the label is centered.
-  const workingRow = (label: string, showCancel: boolean) => (
-    <div className="sbase">
-      <div className="sbase-l">
-        <span className="sspinner" />
-      </div>
-      <span className="swork-label">{label}</span>
-      <div className="sbase-r">{showCancel && cancelBtn}</div>
+  const insertingRow = (
+    <div className="overlay-control-row inserting">
+      <span className="overlay-leading">
+        <span className="overlay-spinner" />
+      </span>
+      <strong>{t("overlay.inserting")}</strong>
+      {cancelButton}
     </div>
   );
 
-  // ---- Live overlay: a pill that sculpts open into a panel ----
-  if (state === "streaming") {
-    const hasText =
-      streamText.committed.length > 0 || streamText.tentative.length > 0;
-    const working = phase === "working";
-    // Keep the panel open whenever there's text — even while finalizing — so the
-    // transcript stays put under a working spinner instead of collapsing and
-    // squishing the text mid-stream. Only fall back to the small working pill
-    // when there was no text to preserve.
-    const open = hasText;
-    const collapsed = working && !hasText;
-
+  if (state === "idle") {
     return (
-      <div dir={direction} className={`ov-stage ${position}`}>
-        <div
-          key={session}
-          className={`scard ${open ? "open" : ""} ${collapsed ? "working" : ""} ${
-            isVisible ? "" : "leaving"
-          }`}
-        >
-          <div className="stext">
-            <div className="stext-clip">
-              <div
-                className={`stext-cap ${overflowing ? "overflowing" : ""}`}
-                ref={capRef}
-                onScroll={handleStreamScroll}
-              >
-                <p>
-                  <span className="committed">
-                    {streamText.committed ? streamText.committed + " " : ""}
-                  </span>
-                  <span className="tentative">{streamText.tentative}</span>
-                  {/* Drop the blinking caret once finalizing — it's no longer
-                      capturing, and a static spinner conveys the work. */}
-                  {!working && <span className="scaret" />}
-                </p>
-              </div>
-            </div>
-          </div>
-          {working
-            ? workingRow(
-                workKind === "polishing"
-                  ? t("overlay.processing")
-                  : t("overlay.transcribing"),
-                true,
-              )
-            : listeningRow(open, true)}
+      <div className={`overlay-stage ${position}`}>
+        <div className="overlay-pill idle">
+          <span className="overlay-leading">
+            <MicrophoneGlyph />
+          </span>
+          <strong>{t("overlay.dictate")}</strong>
+          {hotkey && <span className="overlay-hotkey">{hotkey}</span>}
         </div>
       </div>
     );
   }
 
-  // ---- Minimal overlay: exactly one row at a time — waveform (recording), or a
-  // spinner + label (transcribing / processing). Never both. The pill animates its
-  // width between them; the cancel button is in both rows so it stays put.
-  const working = state === "transcribing" || state === "processing";
-  const workLabel =
-    state === "processing"
-      ? t("overlay.processing")
-      : t("overlay.transcribing");
+  if (!isVisible) return null;
 
+  if (state === "streaming") {
+    const hasText = Boolean(streamText.committed || streamText.tentative);
+    const working = phase === "working";
+
+    return (
+      <div dir={direction} className={`overlay-stage ${position}`}>
+        <div
+          key={session}
+          className={`overlay-card ${hasText ? "open" : "collapsed"} ${
+            working ? "working" : "listening"
+          }`}
+        >
+          <div className="overlay-transcript">
+            <div
+              className={`overlay-transcript-scroll ${
+                overflowing ? "overflowing" : ""
+              }`}
+              ref={capRef}
+              onScroll={handleStreamScroll}
+            >
+              <p>
+                <span className="committed">
+                  {streamText.committed ? `${streamText.committed} ` : ""}
+                </span>
+                <span className="tentative">{streamText.tentative}</span>
+                {!working && <span className="overlay-caret" />}
+              </p>
+            </div>
+          </div>
+          {working ? insertingRow : renderListeningRow(hasText)}
+        </div>
+      </div>
+    );
+  }
+
+  const working = state === "transcribing" || state === "processing";
   return (
-    <div
-      dir={direction}
-      className={`ov-stage ${position} ov-fade ${isVisible ? "show" : ""}`}
-    >
-      <div
-        className={`scard compact ${working && isVisible ? "cworking" : ""}`}
-      >
-        {working ? workingRow(workLabel, true) : listeningRow(false, true)}
+    <div dir={direction} className={`overlay-stage ${position}`}>
+      <div className={`overlay-pill ${working ? "inserting" : "listening"}`}>
+        {working ? insertingRow : renderListeningRow()}
       </div>
     </div>
   );

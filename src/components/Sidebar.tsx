@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Cog, FlaskConical, History, Info, Sparkles, Cpu } from "lucide-react";
-import CarePilotDictateLogo from "./icons/CarePilotDictateLogo";
+import {
+  Cog,
+  Cpu,
+  FlaskConical,
+  History,
+  Info,
+  Mic,
+  Sparkles,
+} from "lucide-react";
+import { getVersion } from "@tauri-apps/api/app";
 import CarePilotMark from "./icons/CarePilotMark";
+import UpdateChecker from "./update-checker";
 import { useSettings } from "../hooks/useSettings";
 import {
   GeneralSettings,
@@ -87,37 +96,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { t } = useTranslation();
   const { settings } = useSettings();
+  const [version, setVersion] = useState("");
+
+  useEffect(() => {
+    getVersion()
+      .then(setVersion)
+      .catch(() => setVersion("0.1.2"));
+  }, []);
 
   const availableSections = Object.entries(SECTIONS_CONFIG)
     .filter(([_, config]) => config.enabled(settings))
     .map(([id, config]) => ({ id: id as SidebarSection, ...config }));
 
   return (
-    <div className="flex flex-col w-40 h-full bg-surface border-e border-mid-gray/20 items-center px-2">
-      <CarePilotDictateLogo width={120} className="m-4" />
-      <div className="flex flex-col w-full items-center gap-1 pt-3 border-t border-mid-gray/20">
+    <aside className="settings-sidebar">
+      <div className="sidebar-brand">
+        <span className="sidebar-brand-mark">
+          <Mic aria-hidden="true" />
+        </span>
+        <span>{t("sidebar.brand")}</span>
+      </div>
+      <nav className="sidebar-nav">
         {availableSections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
 
           return (
-            <div
+            <button
+              type="button"
               key={section.id}
-              className={`flex gap-2 items-center px-3 py-2 w-full rounded-lg cursor-pointer transition-colors ${
-                isActive
-                  ? "bg-logo-primary text-white font-semibold shadow-sm"
-                  : "text-text/75 hover:bg-logo-primary/10 hover:text-text"
-              }`}
+              className={`sidebar-nav-item ${isActive ? "active" : ""}`}
               onClick={() => onSectionChange(section.id)}
             >
-              <Icon width={24} height={24} className="shrink-0" />
-              <p className="text-sm truncate" title={t(section.labelKey)}>
+              <Icon width={16} height={16} className="shrink-0" />
+              <span className="truncate" title={t(section.labelKey)}>
                 {t(section.labelKey)}
-              </p>
-            </div>
+              </span>
+            </button>
           );
         })}
+      </nav>
+      <div className="sidebar-footer">
+        <UpdateChecker className="sidebar-update" />
+        <strong>{t("sidebar.version", { version })}</strong>
+        <span>{t("sidebar.deviceNote")}</span>
       </div>
-    </div>
+    </aside>
   );
 };

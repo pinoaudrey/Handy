@@ -39,23 +39,21 @@ type NonCreatableProps = {
 
 export type SelectProps = BaseProps & (CreatableProps | NonCreatableProps);
 
-const baseBackground = "var(--color-surface)";
-const hoverBackground = "var(--color-surface)";
-const focusBackground = "var(--color-surface)";
-const neutralBorder =
-  "color-mix(in srgb, var(--color-mid-gray) 30%, transparent)";
+const baseBackground = "var(--cp-canvas)";
+const focusBackground = "var(--cp-canvas)";
+const neutralBorder = "var(--cp-border)";
 
 const selectStyles: StylesConfig<SelectOption, false> = {
   control: (base, state) => ({
     ...base,
-    minHeight: 40,
-    borderRadius: 6,
+    minHeight: 36,
+    borderRadius: 8,
     borderColor: state.isFocused ? "var(--color-logo-primary)" : neutralBorder,
     boxShadow: state.isFocused
       ? "0 0 0 3px color-mix(in srgb, var(--color-logo-primary) 25%, transparent)"
       : "none",
     backgroundColor: state.isFocused ? focusBackground : baseBackground,
-    fontSize: "0.875rem",
+    fontSize: "13px",
     color: "var(--color-text)",
     transition: "all 150ms ease",
     ":hover": {
@@ -65,8 +63,8 @@ const selectStyles: StylesConfig<SelectOption, false> = {
   }),
   valueContainer: (base) => ({
     ...base,
-    paddingInline: 10,
-    paddingBlock: 6,
+    paddingInline: 12,
+    paddingBlock: 7,
   }),
   input: (base) => ({
     ...base,

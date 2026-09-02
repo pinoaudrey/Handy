@@ -19,21 +19,38 @@
 }
 
 :root {
+  --cp-canvas: #f2f5f7;
+  --cp-surface: #ffffff;
+  --cp-border: #e3e8ec;
+  --cp-row-divider: #eef1f4;
+  --cp-ink: #22272c;
+  --cp-body-muted: #3e4852;
+  --cp-muted: #64707d;
+  --cp-faint: #9aa4ad;
+  --cp-primary: #3576e7;
+  --cp-primary-deep: #0f59cd;
+  --cp-primary-tint: #ebf2fe;
+  --cp-success-bg: #eaf6ef;
+  --cp-success-dot: #2f9e63;
+  --cp-success-text: #1f7a49;
+  --cp-pill-dark: #1b2026;
+  --cp-pill-secondary: #8b96a3;
+
   /* Palette source of truth. Each themed color is defined once as a
      light/dark pair; the active tokens below and the `data-theme` overrides
      reference these, so a hex value lives in exactly one place.
      Values come from the CarePilot brand ramps: primary (blue), neutral. */
 
   /* Text */
-  --light-color-text: #2b2829;
+  --light-color-text: var(--cp-ink);
   --dark-color-text: #f2f5f7;
 
   /* Page canvas — the calm ground the cards sit on */
-  --light-color-background: #f2f5f7;
+  --light-color-background: var(--cp-canvas);
   --dark-color-background: #16191d;
 
   /* Card / raised surface — sits above the canvas */
-  --light-color-surface: #ffffff;
+  --light-color-surface: var(--cp-surface);
   --dark-color-surface: #22272c;
 
   /* Brand blue. Also the logo fill. */

@@ -4,6 +4,8 @@ import { Dropdown } from "../ui/Dropdown";
 import { SettingContainer } from "../ui/SettingContainer";
 import { useSettings } from "../../hooks/useSettings";
 import type { OverlayPosition, OverlayStyle } from "@/bindings";
+import { Mic } from "lucide-react";
+import { formatShortcutCompact } from "@/lib/utils/keyboard";
 
 interface ShowOverlayProps {
   descriptionMode?: "inline" | "tooltip";
@@ -47,6 +49,7 @@ export const ShowOverlay: React.FC<ShowOverlayProps> = React.memo(
     // "none" from before the position was retired) falls back to "bottom".
     const selectedPosition: OverlayPosition =
       getSetting("overlay_position") === "top" ? "top" : "bottom";
+    const shortcut = getSetting("bindings")?.["transcribe"]?.current_binding;
 
     return (
       <>
@@ -67,21 +70,32 @@ export const ShowOverlay: React.FC<ShowOverlayProps> = React.memo(
         </SettingContainer>
 
         {selectedStyle !== "none" && (
-          <SettingContainer
-            title={t("settings.advanced.overlay.position.title")}
-            description={t("settings.advanced.overlay.position.description")}
-            descriptionMode={descriptionMode}
-            grouped={grouped}
-          >
-            <Dropdown
-              options={positionOptions}
-              selectedValue={selectedPosition}
-              onSelect={(value) =>
-                updateSetting("overlay_position", value as OverlayPosition)
-              }
-              disabled={isUpdating("overlay_position")}
-            />
-          </SettingContainer>
+          <>
+            <SettingContainer
+              title={t("settings.advanced.overlay.position.title")}
+              description={t("settings.advanced.overlay.position.description")}
+              descriptionMode={descriptionMode}
+              grouped={grouped}
+            >
+              <Dropdown
+                options={positionOptions}
+                selectedValue={selectedPosition}
+                onSelect={(value) =>
+                  updateSetting("overlay_position", value as OverlayPosition)
+                }
+                disabled={isUpdating("overlay_position")}
+              />
+            </SettingContainer>
+            <div className="overlay-preview-wrap">
+              <div className="overlay-preview-pill">
+                <span className="overlay-preview-mic">
+                  <Mic />
+                </span>
+                <strong>{t("settings.general.floatingBar.pillLabel")}</strong>
+                {shortcut && <span>{formatShortcutCompact(shortcut)}</span>}
+              </div>
+            </div>
+          </>
         )}
       </>
     );
