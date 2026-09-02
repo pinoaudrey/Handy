@@ -11,7 +11,6 @@ import { ModelStateEvent, RecordingErrorEvent } from "./lib/types/events";
 import "./App.css";
 import AccessibilityPermissions from "./components/AccessibilityPermissions";
 import SecureInputWarning from "./components/SecureInputWarning";
-import Footer from "./components/footer";
 import Onboarding, { AccessibilityOnboarding } from "./components/onboarding";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
@@ -23,7 +22,16 @@ import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
 type OnboardingStep = "accessibility" | "model" | "done";
 
-const renderSettingsContent = (section: SidebarSection) => {
+const renderSettingsContent = (
+  section: SidebarSection,
+  onSectionChange: (section: SidebarSection) => void,
+) => {
+  if (section === "general") {
+    const GeneralComponent = SECTIONS_CONFIG.general.component;
+    return (
+      <GeneralComponent onNavigateModels={() => onSectionChange("models")} />
+    );
+  }
   const ActiveComponent =
     SECTIONS_CONFIG[section]?.component || SECTIONS_CONFIG.general.component;
   return <ActiveComponent />;
@@ -292,7 +300,7 @@ function App() {
     content = (
       <div
         dir={direction}
-        className="h-screen flex flex-col select-none cursor-default"
+        className="settings-shell h-screen flex select-none cursor-default"
       >
         <ErrorBoundary context="What's New">
           <WhatsNewGate />
@@ -304,18 +312,16 @@ function App() {
             onSectionChange={setCurrentSection}
           />
           {/* Scrollable content area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <main className="settings-main flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto">
-              <div className="flex flex-col items-center p-4 gap-4">
+              <div className="settings-content flex flex-col items-center">
                 <AccessibilityPermissions />
                 <SecureInputWarning />
-                {renderSettingsContent(currentSection)}
+                {renderSettingsContent(currentSection, setCurrentSection)}
               </div>
             </div>
-          </div>
+          </main>
         </div>
-        {/* Fixed footer at bottom */}
-        <Footer />
       </div>
     );
   }
