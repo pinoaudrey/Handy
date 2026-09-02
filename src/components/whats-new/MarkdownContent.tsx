@@ -66,23 +66,23 @@ const components: Components = {
     <h3 className="text-sm font-semibold leading-snug text-text">{children}</h3>
   ),
   p: ({ children }) => (
-    <p className="text-sm leading-relaxed text-text/80">{children}</p>
+    <p className="text-sm leading-relaxed text-text/85">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc space-y-1 ps-5 text-sm leading-relaxed text-text/80">
+    <ul className="list-disc space-y-1 ps-5 text-sm leading-relaxed text-text/85">
       {children}
     </ul>
   ),
   li: ({ children }) => (
-    <li className="pl-1 marker:text-text/50">{children}</li>
+    <li className="pl-1 marker:text-logo-primary/60">{children}</li>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal space-y-1 ps-5 text-sm leading-relaxed text-text/80">
+    <ol className="list-decimal space-y-1 ps-5 text-sm leading-relaxed text-text/85">
       {children}
     </ol>
   ),
   br: () => <br />,
-  hr: () => <hr className="border-mid-gray/20" />,
+  hr: () => <hr className="border-mid-gray/15" />,
   img: ({ alt, src }) => {
     if (!src || !isSafeImageSrc(src)) return null;
 
@@ -97,7 +97,7 @@ const components: Components = {
     );
   },
   blockquote: ({ children }) => (
-    <blockquote className="border-s-2 border-logo-primary/50 ps-3 text-sm leading-relaxed text-text/70">
+    <blockquote className="border-s-2 border-logo-primary ps-3 text-sm leading-relaxed text-text/75">
       {children}
     </blockquote>
   ),
@@ -113,13 +113,13 @@ const components: Components = {
     }
 
     return (
-      <code className="rounded bg-mid-gray/10 px-1 py-0.5 font-mono text-[0.85em]">
+      <code className="rounded bg-mid-gray/10 px-1.5 py-0.5 font-mono text-[0.85em] text-text">
         {children}
       </code>
     );
   },
   pre: ({ children }) => (
-    <pre className="overflow-x-auto rounded-md bg-mid-gray/10 p-3 text-xs leading-relaxed text-text/80">
+    <pre className="overflow-x-auto rounded-lg bg-mid-gray/10 p-3 text-xs leading-relaxed text-text/85">
       {children}
     </pre>
   ),

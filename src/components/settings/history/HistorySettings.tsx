@@ -25,10 +25,10 @@ const IconButton: React.FC<{
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`p-1.5 rounded-md flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed disabled:text-text/20 ${
+    className={`p-1.5 rounded-md flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
       active
-        ? "text-logo-primary hover:text-logo-primary/80"
-        : "text-text/50 hover:text-logo-primary"
+        ? "text-logo-primary hover:bg-logo-primary/10"
+        : "text-mid-gray hover:text-logo-primary hover:bg-logo-primary/10"
     }`}
     title={title}
   >
@@ -238,13 +238,13 @@ export const HistorySettings: React.FC = () => {
 
   if (loading) {
     content = (
-      <div className="px-4 py-3 text-center text-text/60">
+      <div className="px-4 py-6 text-center text-sm text-mid-gray">
         {t("settings.history.loading")}
       </div>
     );
   } else if (entries.length === 0) {
     content = (
-      <div className="px-4 py-3 text-center text-text/60">
+      <div className="px-4 py-6 text-center text-sm text-mid-gray">
         {t("settings.history.empty")}
       </div>
     );
@@ -252,7 +252,7 @@ export const HistorySettings: React.FC = () => {
     content = (
       <>
         <AudioPlayerGroup>
-          <div className="divide-y divide-mid-gray/20">
+          <div className="divide-y divide-mid-gray/15">
             {entries.map((entry) => (
               <HistoryEntryComponent
                 key={entry.id}
@@ -275,9 +275,9 @@ export const HistorySettings: React.FC = () => {
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <div className="space-y-2">
-        <div className="px-4 flex items-center justify-between">
+        <div className="px-1 flex items-center justify-between">
           <div>
-            <h2 className="text-xs font-medium text-mid-gray uppercase tracking-wide">
+            <h2 className="text-xs font-semibold text-mid-gray uppercase tracking-wider">
               {t("settings.history.title")}
             </h2>
           </div>
@@ -286,7 +286,7 @@ export const HistorySettings: React.FC = () => {
             label={t("settings.history.openFolder")}
           />
         </div>
-        <div className="bg-background border border-mid-gray/20 rounded-lg overflow-visible">
+        <div className="bg-surface border border-mid-gray/20 rounded-xl shadow-sm overflow-visible">
           {content}
         </div>
       </div>
@@ -358,7 +358,9 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   return (
     <div className="px-4 py-2 pb-5 flex flex-col gap-3">
       <div className="flex justify-between items-center">
-        <p className="text-sm font-medium">{formattedDate}</p>
+        <p className="text-xs font-semibold text-mid-gray uppercase tracking-wide">
+          {formattedDate}
+        </p>
         <div className="flex items-center">
           <IconButton
             onClick={handleCopyText}
@@ -413,12 +415,12 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       </div>
 
       <p
-        className={`italic text-sm pb-2 ${
+        className={`text-sm leading-relaxed pb-2 ${
           retrying
             ? ""
             : hasTranscription
-              ? "text-text/90 select-text cursor-text whitespace-pre-wrap break-words"
-              : "text-text/40"
+              ? "text-text select-text cursor-text whitespace-pre-wrap break-words"
+              : "text-mid-gray"
         }`}
         style={
           retrying

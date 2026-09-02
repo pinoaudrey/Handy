@@ -290,7 +290,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
         {!isCreating && hasPrompts && selectedPrompt && (
           <div className="space-y-3">
             <div className="space-y-2 flex flex-col">
-              <label className="text-sm font-semibold">
+              <label className="text-sm font-semibold text-text">
                 {t("settings.postProcessing.prompts.promptLabel")}
               </label>
               <Input
@@ -305,7 +305,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
             </div>
 
             <div className="space-y-2 flex flex-col">
-              <label className="text-sm font-semibold">
+              <label className="text-sm font-semibold text-text">
                 {t("settings.postProcessing.prompts.promptInstructions")}
               </label>
               <Textarea
@@ -315,7 +315,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
                   "settings.postProcessing.prompts.promptInstructionsPlaceholder",
                 )}
               />
-              <p className="text-xs text-mid-gray/70">
+              <p className="text-xs text-mid-gray">
                 <Trans
                   i18nKey="settings.postProcessing.prompts.promptTip"
                   components={{ code: <code /> }}
@@ -345,7 +345,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
         )}
 
         {!isCreating && !selectedPrompt && (
-          <div className="p-3 bg-mid-gray/5 rounded-md border border-mid-gray/20">
+          <div className="p-4 bg-mid-gray/5 rounded-lg border border-mid-gray/20 border-dashed">
             <p className="text-sm text-mid-gray">
               {hasPrompts
                 ? t("settings.postProcessing.prompts.selectToEdit")
@@ -356,7 +356,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
 
         {isCreating && (
           <div className="space-y-3">
-            <div className="space-y-2 block flex flex-col">
+            <div className="space-y-2 flex flex-col">
               <label className="text-sm font-semibold text-text">
                 {t("settings.postProcessing.prompts.promptLabel")}
               </label>
@@ -372,7 +372,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
             </div>
 
             <div className="space-y-2 flex flex-col">
-              <label className="text-sm font-semibold">
+              <label className="text-sm font-semibold text-text">
                 {t("settings.postProcessing.prompts.promptInstructions")}
               </label>
               <Textarea
@@ -382,7 +382,7 @@ const PostProcessingSettingsPromptsComponent: React.FC = () => {
                   "settings.postProcessing.prompts.promptInstructionsPlaceholder",
                 )}
               />
-              <p className="text-xs text-mid-gray/70">
+              <p className="text-xs text-mid-gray">
                 <Trans
                   i18nKey="settings.postProcessing.prompts.promptTip"
                   components={{ code: <code /> }}
