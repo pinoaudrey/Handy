@@ -11,7 +11,7 @@ export const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "text-sm bg-surface border border-mid-gray/30 rounded-md text-start text-text transition-colors duration-150 placeholder:text-mid-gray/60";
+    "text-sm bg-background border border-[#E3E8EC] rounded-md text-start text-text transition-colors duration-150 placeholder:text-mid-gray/60";
 
   const interactiveClasses = disabled
     ? "opacity-60 cursor-not-allowed bg-mid-gray/5 border-mid-gray/20"

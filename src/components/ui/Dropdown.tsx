@@ -65,7 +65,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         type="button"
-        className={`px-3 py-1.5 text-sm bg-surface text-text border border-mid-gray/30 rounded-md min-w-[200px] w-full text-start grid grid-cols-[1fr_auto] gap-2 items-center transition-colors duration-150 ${
+        className={`px-3 py-[7px] text-[13px] bg-background text-text border border-[#E3E8EC] rounded-lg min-w-[200px] w-full text-start grid grid-cols-[1fr_auto] gap-2 items-center transition-colors duration-150 ${
           disabled
             ? "opacity-50 cursor-not-allowed"
             : "cursor-pointer hover:border-mid-gray/50"

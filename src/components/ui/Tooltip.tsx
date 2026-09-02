@@ -100,13 +100,20 @@ export const Tooltip: React.FC<TooltipProps> = ({
         width: TOOLTIP_WIDTH,
         zIndex: 9999,
         opacity: coords ? 1 : 0,
+        color: "var(--cp-muted)",
+        background: "var(--cp-surface)",
+        borderColor: "var(--cp-border)",
+        boxShadow: "0 8px 24px rgb(15 32 58 / 14%)",
       }}
-      className="px-3 py-2 bg-surface text-text border border-mid-gray/20 rounded-lg shadow-lg whitespace-normal transition-opacity duration-150"
+      className="px-3 py-2 border rounded-lg whitespace-normal transition-opacity duration-150"
     >
       {children}
       <div
-        style={{ left: coords?.arrowLeft ?? 0 }}
-        className={`absolute ${arrowClasses} transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-mid-gray/20`}
+        style={{
+          left: coords?.arrowLeft ?? 0,
+          borderTopColor: "var(--cp-border)",
+        }}
+        className={`absolute ${arrowClasses} transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent`}
       />
     </div>,
     document.body,

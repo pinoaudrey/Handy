@@ -44,7 +44,7 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
           disabled={disabled || isUpdating}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <div className="relative w-11 h-6 bg-mid-gray/30 peer-focus-visible:ring-2 peer-focus-visible:ring-logo-primary/40 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:shadow-sm after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-logo-primary peer-disabled:opacity-50"></div>
+        <div className="settings-toggle peer"></div>
       </label>
       {isUpdating && (
         <div className="absolute inset-0 flex items-center justify-center">
